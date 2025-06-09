@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>単語意味クイズ 第5章</title>
+  <style>
+    body { font-family: sans-serif; background: #f1f3f7; margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh;}
+    header {
+      background: #2c3e50;
+      color: #fff;
+      width: 100%;
+      padding: 1em 0;
+      text-align: center;
+      font-size: 1.2em;
+      letter-spacing: 0.1em;
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .header-btn-home {
+      background: #888;
+      color: #fff;
+      border: none;
+      padding: 0.5em 1.2em;
+      border-radius: 5px;
+      font-size: 1em;
+      cursor: pointer;
+      transition: background 0.2s;
+      margin-right: auto;
+      margin-left: 20px;
+      order: 0;
+    }
+    .header-btn-home:hover { background: #555; }
+    .header-title {
+      order: 1;
+      margin: 0 auto;
+      width: fit-content;
+      position: relative;
+      z-index: 0;
+      pointer-events: none;
+    }
+    .container {
+      margin-top: 40px;
+      background: #fff;
+      padding: 2em 2em 1em 2em;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      min-width: 300px;
+      max-width: 90vw;
+      width: 420px;
+      text-align: center;
+    }
+    .question { font-size: 1.3em; margin-bottom: 1em;}
+    .choices { display: flex; flex-direction: column; gap: 1em; margin-bottom: 1em;}
+    .choice-btn { padding: 0.8em; border: 1px solid #3498db; border-radius: 5px; background: #ecf6fb; cursor: pointer; transition: background 0.2s; font-size: 1em;}
+    .choice-btn:hover { background: #d0eafd;}
+    .result { font-weight: bold; margin-bottom: 1em;}
+    .next-btn, .home-btn {
+      background: #2ecc71;
+      color: #fff;
+      border: none;
+      padding: 0.7em 1.5em;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1em;
+      margin-right: 0.7em;
+      margin-bottom: 0.7em;
+    }
+    .next-btn:disabled { background: #aaa; cursor: not-allowed;}
+    .home-btn { background: #888;}
+    .home-btn:hover { background: #555;}
+  </style>
+</head>
+<body>
+  <header>
+    <button class="header-btn-home" id="headerHomeBtn" onclick="location.href='index.html'">ホームへ戻る</button>
+    <span class="header-title">第5章：文化・歴史</span>
+  </header>
+  <div class="container">
+    <div id="quiz"></div>
+  </div>
+  <script>
+    const quizData = [
+      { word: "伝統", choices: ["新しい習慣", "昔から受け継がれてきたこと", "外国の文化", "偶然の出来事"], answer: 1 },
+      { word: "文明", choices: ["野生の暮らし", "文化や技術が発達した社会", "動物の社会", "自然だけの世界"], answer: 1 },
+      { word: "遺産", choices: ["今作られたもの", "受け継がれた文化や財産", "壊れた建物", "新しい技術"], answer: 1 }
+    ];
+    let current = 0, answered = false;
+    function renderQuiz() {
+      document.getElementById('headerHomeBtn').style.display = '';
+      const q = quizData[current];
+      let html = `<div class="question"><b>「${q.word}」の意味はどれ？</b></div>`;
+      html += '<div class="choices">';
+      q.choices.forEach((c, idx) => { html += `<button class="choice-btn" data-idx="${idx}" ${answered ? 'disabled' : ''}>${c}</button>`; });
+      html += '</div>';
+      html += `<div class="result" id="result"></div>`;
+      html += `<button class="next-btn" id="nextBtn" ${!answered ? 'disabled' : ''}>${current < quizData.length - 1 ? "次の問題へ" : "終了"}</button>`;
+      document.getElementById('quiz').innerHTML = html;
+      document.querySelectorAll('.choice-btn').forEach(btn => {
+        btn.addEventListener('click', e => {
+          if (answered) return;
+          const idx = Number(btn.getAttribute('data-idx'));
+          answered = true;
+          if (idx === q.answer) {
+            document.getElementById('result').textContent = "正解！";
+            btn.style.background = "#c8f7c5";
+          } else {
+            document.getElementById('result').textContent = `不正解。正解は「${q.choices[q.answer]}」`;
+            btn.style.background = "#fabfbf";
+          }
+          document.querySelectorAll('.choice-btn').forEach(b => b.disabled = true);
+          document.getElementById('nextBtn').disabled = false;
+        });
+      });
+      document.getElementById('nextBtn').addEventListener('click', () => {
+        current++; answered = false;
+        if (current < quizData.length) {
+          renderQuiz();
+        } else {
+          document.getElementById('headerHomeBtn').style.display = 'none';
+          document.getElementById('quiz').innerHTML = `
+            <div class="result">クイズが終了しました！お疲れさまでした。</div>
+            <button class="home-btn" onclick="location.href='index.html'">ホームへ戻る</button>
+          `;
+        }
+      });
+    }
+    renderQuiz();
+  </script>
+</body>
+</html>
